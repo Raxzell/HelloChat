@@ -1,38 +1,35 @@
-/* =====================================================
-   HELLOCHAT — style.css
+/* HelloChat — style.css
    Tema: Langit Malam (Night Sky Minimalist)
-   Font: Plus Jakarta Sans
-   ===================================================== */
+   Font: Plus Jakarta Sans */
 
-/* =====================================================
-   1. CSS CUSTOM PROPERTIES (Design Tokens)
-   Semua warna, spacing, dan transisi didefinisikan di sini
-   supaya gampang diubah secara konsisten.
-   ===================================================== */
+
+/* 1. CSS CUSTOM PROPERTIES
+   Semua token desain (warna, spacing, transisi) dikumpulkan di sini
+   supaya perubahan tema cukup dilakukan di satu tempat. */
 :root {
-  /* --- Palette: Night Sky --- */
-  --clr-bg-deepest:   #050810;   /* Hitam ruang angkasa */
-  --clr-bg-deep:      #080d1a;   /* Biru gelap tengah malam */
-  --clr-bg-mid:       #0d1526;   /* Biru tengah malam */
-  --clr-surface:      #111a30;   /* Permukaan kartu */
-  --clr-surface-2:    #172040;   /* Kartu ghost lebih terang */
+  /* Palette warna langit malam */
+  --clr-bg-deepest:   #050810;   /* hitam ruang angkasa */
+  --clr-bg-deep:      #080d1a;   /* biru gelap tengah malam */
+  --clr-bg-mid:       #0d1526;   /* biru tengah malam */
+  --clr-surface:      #111a30;   /* permukaan kartu */
+  --clr-surface-2:    #172040;   /* kartu ghost lebih terang */
   --clr-border:       rgba(120, 160, 255, 0.12);
   --clr-border-glow:  rgba(120, 160, 255, 0.30);
 
-  /* --- Accent Colors --- */
-  --clr-accent:       #6d9ef8;   /* Biru bintang */
+  /* Warna aksen */
+  --clr-accent:       #6d9ef8;   /* biru bintang */
   --clr-accent-soft:  #4a7cdc;
   --clr-accent-glow:  rgba(109, 158, 248, 0.20);
-  --clr-star:         #c8d8ff;   /* Warna bintang kecil */
-  --clr-nebula-1:     rgba(80, 50, 180, 0.12);  /* Ungu nebula */
-  --clr-nebula-2:     rgba(30, 80, 200, 0.10);  /* Biru nebula */
+  --clr-star:         #c8d8ff;   /* warna titik bintang */
+  --clr-nebula-1:     rgba(80, 50, 180, 0.12);   /* ungu nebula */
+  --clr-nebula-2:     rgba(30, 80, 200, 0.10);   /* biru nebula */
 
-  /* --- Text --- */
+  /* Warna teks */
   --clr-text-primary:   #e8eeff;
   --clr-text-secondary: #8fa8d8;
   --clr-text-muted:     #4a6090;
 
-  /* --- Spacing --- */
+  /* Spacing */
   --space-xs:   4px;
   --space-sm:   8px;
   --space-md:   16px;
@@ -40,27 +37,26 @@
   --space-xl:   40px;
   --space-2xl:  64px;
 
-  /* --- Border Radius --- */
+  /* Border radius */
   --radius-sm:  8px;
   --radius-md:  16px;
   --radius-lg:  24px;
   --radius-xl:  32px;
 
-  /* --- Transitions --- */
+  /* Durasi transisi */
   --trans-fast:   0.15s ease;
   --trans-base:   0.30s ease;
   --trans-slow:   0.55s cubic-bezier(0.4, 0, 0.2, 1);
   --trans-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* --- Shadows --- */
+  /* Shadow */
   --shadow-card:  0 20px 60px rgba(0, 5, 30, 0.6), 0 4px 20px rgba(0, 5, 30, 0.4);
   --shadow-glow:  0 0 40px rgba(109, 158, 248, 0.15);
   --shadow-btn:   0 4px 24px rgba(109, 158, 248, 0.25);
 }
 
-/* =====================================================
-   2. RESET & BASE
-   ===================================================== */
+
+/* 2. RESET & BASE */
 *,
 *::before,
 *::after {
@@ -89,10 +85,10 @@ body {
   position: relative;
 }
 
-/* =====================================================
-   3. STAR BACKGROUND
-   Dibuat dinamis lewat JS, tapi animasinya di sini.
-   ===================================================== */
+
+/* 3. STAR BACKGROUND
+   Container diisi titik-titik bintang oleh JS.
+   Animasi kedip dan gradien nebula didefinisikan di sini. */
 .stars-container {
   position: fixed;
   inset: 0;
@@ -101,7 +97,6 @@ body {
   overflow: hidden;
 }
 
-/* Bintang individual */
 .star {
   position: absolute;
   background: var(--clr-star);
@@ -116,7 +111,7 @@ body {
   50%       { opacity: calc(var(--star-opacity, 0.6) * 0.3); transform: scale(0.7); }
 }
 
-/* Overlay nebula — gradien ambient di background */
+/* Overlay gradien nebula di atas bintang sebagai ambient background */
 .stars-container::before {
   content: '';
   position: absolute;
@@ -128,9 +123,9 @@ body {
   pointer-events: none;
 }
 
-/* =====================================================
-   4. APP WRAPPER — Container Utama
-   ===================================================== */
+
+/* 4. APP WRAPPER
+   Container utama yang membatasi lebar konten dan menengahkan layout. */
 .app-wrapper {
   position: relative;
   z-index: 1;
@@ -146,9 +141,8 @@ body {
   gap: var(--space-lg);
 }
 
-/* =====================================================
-   5. HEADER
-   ===================================================== */
+
+/* 5. HEADER */
 .app-header {
   text-align: center;
   display: flex;
@@ -166,7 +160,6 @@ body {
 .logo-icon {
   font-size: 1.4rem;
   color: var(--clr-accent);
-  /* Animasi berdenyut seperti bintang */
   animation: logoPulse 4s ease-in-out infinite;
   display: inline-block;
 }
@@ -194,9 +187,8 @@ body {
   font-style: italic;
 }
 
-/* =====================================================
-   6. PROGRESS BAR
-   ===================================================== */
+
+/* 6. PROGRESS BAR */
 .progress-section {
   width: 100%;
   display: flex;
@@ -245,20 +237,19 @@ body {
   box-shadow: 0 0 8px var(--clr-accent);
 }
 
-/* =====================================================
-   7. CARD STAGE — Area Tumpukan Kartu
-   ===================================================== */
+
+/* 7. CARD STAGE
+   Wrapper posisi relatif agar ghost card bisa ditumpuk secara absolut. */
 .card-stage {
   position: relative;
   width: 100%;
-  /* Tinggi minimum kartu supaya tidak loncat-loncat */
   min-height: 340px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* ---- Ghost Cards (Tumpukan dekoratif di belakang) ---- */
+/* Ghost card: elemen dekoratif yang memberikan efek visual tumpukan kartu */
 .card-stack-ghost {
   position: absolute;
   width: 100%;
@@ -284,14 +275,14 @@ body {
   z-index: 0;
 }
 
-/* Saat kartu habis, ghost naik ke atas */
+/* Ghost card menghilang saat semua kartu habis */
 .card-stage.is-empty .ghost-1,
 .card-stage.is-empty .ghost-2 {
   opacity: 0;
   transform: translateY(0) scale(1);
 }
 
-/* ---- Active Card ---- */
+/* Kartu aktif: berada di atas ghost, menampilkan pertanyaan */
 .active-card {
   position: relative;
   z-index: 2;
@@ -303,8 +294,8 @@ body {
   padding: var(--space-xl) var(--space-xl);
   display: flex;
   flex-direction: column;
-  align-items: center;         /* center isi secara horizontal */
-  justify-content: center;     /* center isi secara vertikal */
+  align-items: center;
+  justify-content: center;
   box-shadow: var(--shadow-card), var(--shadow-glow);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -318,25 +309,25 @@ body {
   transform-style: preserve-3d;
 }
 
-/* Hover effect — sedikit terangkat */
+/* Efek hover: kartu sedikit terangkat */
 .active-card:hover {
   box-shadow: var(--shadow-card), 0 0 60px rgba(109, 158, 248, 0.22);
   border-color: var(--clr-border-glow);
   transform: translateY(-4px);
 }
 
-/* ---- Animasi Kartu: Keluar (slide ke atas + fade) ---- */
+/* Animasi exit saat maju: kartu terbang ke atas */
 .active-card.card-exit {
   animation: cardExit 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
   pointer-events: none;
 }
 
 @keyframes cardExit {
-  0%   { opacity: 1;   transform: translateY(-4px) rotate(0deg); }
-  100% { opacity: 0;   transform: translateY(-60px) rotate(-4deg) scale(0.9); }
+  0%   { opacity: 1; transform: translateY(-4px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(-60px) rotate(-4deg) scale(0.9); }
 }
 
-/* ---- Animasi Kartu: Keluar ke Bawah (backward) ---- */
+/* Animasi exit saat mundur: kartu jatuh ke bawah */
 .active-card.card-exit-reverse {
   animation: cardExitReverse 0.38s cubic-bezier(0.4, 0, 1, 1) forwards;
   pointer-events: none;
@@ -347,33 +338,33 @@ body {
   100% { opacity: 0; transform: translateY(50px) rotate(2deg) scale(0.93); }
 }
 
-/* ---- Animasi Kartu: Masuk dari Bawah (forward) ---- */
+/* Animasi masuk saat maju: kartu naik dari bawah */
 .active-card.card-enter {
   animation: cardEnter 0.45s var(--trans-spring) forwards;
 }
 
 @keyframes cardEnter {
   0%   { opacity: 0; transform: translateY(40px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0)   scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ---- Animasi Kartu: Masuk dari Atas (backward) ---- */
+/* Animasi masuk saat mundur: kartu turun dari atas */
 .active-card.card-enter-reverse {
   animation: cardEnterReverse 0.45s var(--trans-spring) forwards;
 }
 
 @keyframes cardEnterReverse {
   0%   { opacity: 0; transform: translateY(-40px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0)    scale(1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ---- Isi Kartu ---- */
+/* Isi kartu: pertanyaan dan hint selamat datang */
 .card-content {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* center anak secara horizontal */
-  justify-content: center;  /* center anak secara vertikal */
+  align-items: center;
+  justify-content: center;
   gap: var(--space-lg);
   text-align: center;
 }
@@ -405,7 +396,6 @@ body {
   text-align: center;
 }
 
-/* Hint teks di bawah pertanyaan awal */
 .card-cta-hint {
   font-size: 0.82rem;
   color: var(--clr-text-muted);
@@ -414,7 +404,7 @@ body {
   width: 100%;
 }
 
-/* ---- Hiasan Sudut Kartu (Dekoratif) ---- */
+/* Ikon dekoratif di pojok kanan bawah kartu */
 .active-card::before {
   content: '✦';
   position: absolute;
@@ -431,14 +421,14 @@ body {
   color: rgba(109, 158, 248, 0.35);
 }
 
-/* =====================================================
-   8. EMPTY STATE — Semua Kartu Sudah Habis
-   ===================================================== */
+
+/* 8. EMPTY STATE
+   Tampil menggantikan kartu aktif saat semua pertanyaan sudah habis. */
 .card-empty-state {
   position: absolute;
   inset: 0;
   z-index: 3;
-  display: none;  /* Ditampilkan lewat JS */
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -476,9 +466,8 @@ body {
   max-width: 280px;
 }
 
-/* =====================================================
-   9. CONTROLS — Tombol Navigasi
-   ===================================================== */
+
+/* 9. CONTROLS — Tombol navigasi */
 .controls {
   display: flex;
   align-items: center;
@@ -487,7 +476,7 @@ body {
   justify-content: center;
 }
 
-/* ---- Base Button Style ---- */
+/* Base style untuk semua tombol */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -521,7 +510,7 @@ body {
   cursor: not-allowed;
 }
 
-/* Ripple effect */
+/* Efek kilap putih tipis saat tombol ditekan */
 .btn::after {
   content: '';
   position: absolute;
@@ -536,7 +525,7 @@ body {
   opacity: 0.06;
 }
 
-/* ---- Primary Button (Berikutnya) ---- */
+/* Tombol utama Berikutnya */
 .btn-primary {
   background: linear-gradient(135deg, var(--clr-accent-soft), var(--clr-accent));
   color: #fff;
@@ -550,7 +539,7 @@ body {
   box-shadow: 0 6px 32px rgba(109, 158, 248, 0.40);
 }
 
-/* ---- Ghost Button (Reset — icon only) ---- */
+/* Tombol reset — hanya ikon, tanpa teks */
 .btn-ghost {
   background: transparent;
   color: var(--clr-text-muted);
@@ -569,7 +558,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* ---- Secondary Button (Sebelumnya) ---- */
+/* Tombol Sebelumnya */
 .btn-secondary {
   background: transparent;
   color: var(--clr-text-secondary);
@@ -584,7 +573,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* ---- Button Icon ---- */
 .btn-icon {
   width: 18px;
   height: 18px;
@@ -592,8 +580,8 @@ body {
   stroke: currentColor;
 }
 
-/* Animasi spin untuk icon reset saat diklik */
-.btn-secondary.is-spinning .btn-icon {
+/* Animasi putar ikon saat tombol reset ditekan */
+.btn-ghost.is-spinning .btn-icon {
   animation: spinOnce 0.5s ease-in-out;
 }
 
@@ -602,11 +590,10 @@ body {
   100% { transform: rotate(-360deg); }
 }
 
-/* =====================================================
-   10. RESPONSIVE — Mobile & Tablet
-   ===================================================== */
 
-/* Tablet (max-width: 600px) */
+/* 10. RESPONSIVE */
+
+/* Layar tablet ke bawah */
 @media (max-width: 600px) {
   .app-wrapper {
     padding: var(--space-lg) var(--space-md);
@@ -636,7 +623,7 @@ body {
   }
 }
 
-/* Mobile kecil (max-width: 380px) */
+/* Layar mobile sangat kecil */
 @media (max-width: 380px) {
   .card-question {
     font-size: 1rem;
@@ -656,8 +643,9 @@ body {
     padding: 12px 14px;
   }
 
+  /* Di layar sangat kecil, sembunyikan label "Sebelumnya", tampilkan hanya ikon */
   .btn-secondary span {
-    display: none; /* Di mobile sangat kecil, sembunyikan teks reset, tampilkan icon saja */
+    display: none;
   }
 }
 
@@ -676,18 +664,17 @@ body {
   }
 }
 
-/* =====================================================
-   11. ACCESSIBILITY
-   ===================================================== */
 
-/* Fokus visible untuk keyboard navigasi */
+/* 11. ACCESSIBILITY */
+
+/* Outline fokus yang jelas untuk navigasi keyboard */
 :focus-visible {
   outline: 2px solid var(--clr-accent);
   outline-offset: 3px;
   border-radius: var(--radius-sm);
 }
 
-/* Kurangi motion untuk user yang prefer-reduced-motion */
+/* Nonaktifkan semua animasi untuk pengguna yang memilih reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -698,9 +685,8 @@ body {
   }
 }
 
-/* =====================================================
-   12. SCROLLBAR (opsional, untuk kartu sangat panjang)
-   ===================================================== */
+
+/* 12. SCROLLBAR STYLING */
 ::-webkit-scrollbar {
   width: 4px;
 }
