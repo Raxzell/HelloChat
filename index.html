@@ -10,12 +10,12 @@
   <meta name="keywords" content="kartu obrolan, pertanyaan seru, icebreaker, pdkt, percakapan, teman" />
   <meta name="author" content="HelloChat" />
 
-  <!-- Open Graph (Social Media Preview) -->
+  <!-- Open Graph untuk preview saat dibagikan ke media sosial -->
   <meta property="og:title" content="HelloChat — Kartu Obrolan Seru" />
   <meta property="og:description" content="Buka obrolan yang lebih dalam dengan kartu pertanyaan yang di-shuffle setiap ronde." />
   <meta property="og:type" content="website" />
 
-  <!-- Google Fonts: Plus Jakarta Sans (modern, warm, readable) -->
+  <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" />
@@ -24,27 +24,20 @@
 </head>
 <body>
 
-  <!-- =====================================================
-       STAR BACKGROUND — dibuat secara dinamis lewat JS
-       Tapi kita siapkan containernya di sini
-  ====================================================== -->
+  <!-- Container bintang-bintang background, diisi secara dinamis oleh JS -->
   <div class="stars-container" id="starsContainer" aria-hidden="true"></div>
 
-  <!-- =====================================================
-       MAIN WRAPPER
-  ====================================================== -->
   <main class="app-wrapper">
 
-    <!-- HEADER -->
+    <!-- Header: logo aplikasi -->
     <header class="app-header">
       <div class="logo" aria-label="HelloChat">
         <span class="logo-icon">✦</span>
         <span class="logo-text">HelloChat</span>
       </div>
-
     </header>
 
-    <!-- PROGRESS BAR AREA -->
+    <!-- Progress bar menunjukkan posisi kartu saat ini dari total keseluruhan -->
     <section class="progress-section" aria-label="Progress pertanyaan">
       <div class="progress-info">
         <span id="progressLabel" class="progress-label">Pertanyaan <strong id="currentNum">0</strong> dari <strong id="totalNum">30</strong></span>
@@ -55,31 +48,28 @@
       </div>
     </section>
 
-    <!-- =====================================================
-         CARD STACK AREA
-         Tumpukan kartu — hanya kartu aktif yang terlihat penuh,
-         sisanya dirender sebagai "tumpukan" di belakang (CSS).
-    ====================================================== -->
+    <!-- Area kartu: kartu aktif di depan, dua ghost card sebagai tumpukan dekoratif di belakang -->
     <section class="card-stage" aria-label="Kartu pertanyaan">
 
-      <!-- Kartu-kartu stack (dekoratif, di belakang kartu utama) -->
+      <!-- Ghost card paling belakang -->
       <div class="card-stack-ghost ghost-2" aria-hidden="true"></div>
+      <!-- Ghost card tepat di belakang kartu aktif -->
       <div class="card-stack-ghost ghost-1" aria-hidden="true"></div>
 
       <!-- Kartu aktif yang menampilkan pertanyaan -->
       <article class="card active-card" id="activeCard" aria-live="polite">
-        <!-- State: Selamat Datang (ditampilkan pertama kali) -->
         <div class="card-content" id="cardContent">
           <p class="card-question" id="cardQuestion">
             Siap membuka obrolan yang lebih dalam?
           </p>
+          <!-- Hint awal yang hilang setelah kartu pertama ditampilkan -->
           <div class="card-cta-hint" id="cardHint">
             <span>Tekan tombol di bawah untuk mulai ✦</span>
           </div>
         </div>
       </article>
 
-      <!-- State: Semua Kartu Sudah Habis -->
+      <!-- Tampilan saat semua kartu sudah habis -->
       <div class="card-empty-state" id="emptyState" aria-hidden="true">
         <div class="empty-icon">✦</div>
         <h2 class="empty-title">Semua pertanyaan sudah ditampilkan!</h2>
@@ -88,12 +78,10 @@
 
     </section>
 
-    <!-- =====================================================
-         CONTROLS — Tombol aksi
-    ====================================================== -->
+    <!-- Kontrol navigasi: Reset (icon), Sebelumnya, Berikutnya -->
     <footer class="controls" role="group" aria-label="Kontrol kartu">
 
-      <!-- Tombol Reset -->
+      <!-- Tombol reset: hanya ikon, mengocok ulang semua kartu -->
       <button
         class="btn btn-ghost"
         id="btnReset"
@@ -106,7 +94,7 @@
         </svg>
       </button>
 
-      <!-- Tombol Sebelumnya -->
+      <!-- Tombol kembali ke kartu sebelumnya, disabled di kartu pertama -->
       <button
         class="btn btn-secondary"
         id="btnPrev"
@@ -119,7 +107,7 @@
         <span>Sebelumnya</span>
       </button>
 
-      <!-- Tombol Berikutnya (Utama) -->
+      <!-- Tombol utama untuk menampilkan kartu berikutnya -->
       <button
         class="btn btn-primary"
         id="btnNext"
