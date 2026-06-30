@@ -1,17 +1,12 @@
-/**
- * =====================================================
- * HELLOCHAT — script.js
- * Logika Kartu Obrolan: Shuffle, Navigasi, Progress
- * =====================================================
- */
+/* HelloChat — script.js
+   Logika kartu obrolan: shuffle, navigasi maju/mundur, progress, swipe, keyboard. */
 
-/* =====================================================
-   1. DATA — Daftar Pertanyaan
-   Semua pertanyaan dikumpulkan di satu tempat.
-   Nambah pertanyaan? Cukup tambahkan di array ini.
-   ===================================================== */
+
+/* 1. DATA
+   Semua pertanyaan ada di sini. Untuk menambah pertanyaan, cukup tambahkan
+   string baru ke dalam array ini. Lihat README.md untuk panduan lengkapnya. */
 const questions = [
-  // Kategori 1: Throwback (Nostalgia & Masa Lalu)
+  // Throwback — nostalgia & masa lalu
   "Apa momen paling absurd atau lucu yang paling lu inget pas jaman sekolah dulu?",
   "Siapa guru atau kejadian di sekolah dulu yang menurut lu paling membekas sampai sekarang?",
   "Kalau lu bisa balik ke masa jaman awal masuk sekolah dulu, ada ga satu hal yang pengen lu ubah?",
@@ -23,7 +18,7 @@ const questions = [
   "Ada ga satu spot di tempat sekolah/kuliah dulu yang jadi tempat favorit lu buat menyendiri atau nongkrong?",
   "Kalau jaman sekolah dulu ada 'penghargaan' paling gak penting buat murid, kira-kira lu dapet gelar apa?",
 
-  // Kategori 2: Mind Unfolded (Logika & Cara Pandang)
+  // Mind Unfolded — logika & cara pandang
   "Menurut lu, apakah manusia itu bener-bener bisa mengenal dirinya sendiri secara utuh?",
   "Kalau lu dikasih kesempatan buat dapet jawaban jujur dari satu misteri di hidup lu, lu mau nanya tentang apa?",
   "Apa definisi 'hari yang sempurna' atau perfect day versi lu saat ini?",
@@ -35,7 +30,7 @@ const questions = [
   "Lebih takut gagal atau takut ga pernah mencoba sama sekali?",
   "Apa satu prinsip hidup yang lu pegang teguh banget dan ga mau lu langgar?",
 
-  // Kategori 3: Connection & Future (Kedekatan & Support)
+  // Connection & Future — kedekatan & support
   "Apa hal pertama yang terlintas di pikiran lu pas awal-awal kita kenal dulu dibandingin sekarang?",
   "Sebelum nanti kita masuk ke kesibukan baru masing-masing, apa hal yang paling lu tunggu-tunggu ke depannya?",
   "Bagi lu, apa sih hal paling krusial yang bisa bikin lu ngerasa 'aman' dan nyaman pas cerita sama orang lain?",
@@ -48,72 +43,65 @@ const questions = [
   "Music that reminds me of you: Apa lagu yang akhir-akhir ini bikin lu langsung kepikiran tentang gw pas lagi dengerin?"
 ];
 
-/* =====================================================
-   2. DOM REFERENCES
-   Ambil semua elemen DOM yang akan sering dipakai.
-   ===================================================== */
-const activeCard     = document.getElementById('activeCard');
-const cardQuestion   = document.getElementById('cardQuestion');
-const cardHint       = document.getElementById('cardHint');
-const emptyState     = document.getElementById('emptyState');
-const cardStage      = document.querySelector('.card-stage');
-const ghost1         = document.querySelector('.ghost-1');
-const ghost2         = document.querySelector('.ghost-2');
 
-const btnNext        = document.getElementById('btnNext');
-const btnPrev        = document.getElementById('btnPrev');
-const btnReset       = document.getElementById('btnReset');
+/* 2. DOM REFERENCES
+   Ambil semua elemen DOM yang dipakai berulang kali. */
+const activeCard      = document.getElementById('activeCard');
+const cardQuestion    = document.getElementById('cardQuestion');
+const cardHint        = document.getElementById('cardHint');
+const emptyState      = document.getElementById('emptyState');
+const cardStage       = document.querySelector('.card-stage');
+const ghost1          = document.querySelector('.ghost-1');
+const ghost2          = document.querySelector('.ghost-2');
 
-const progressBarFill = document.getElementById('progressBarFill');
+const btnNext         = document.getElementById('btnNext');
+const btnPrev         = document.getElementById('btnPrev');
+const btnReset        = document.getElementById('btnReset');
+
+const progressBarFill  = document.getElementById('progressBarFill');
 const progressBarTrack = document.getElementById('progressBarTrack');
-const currentNumEl    = document.getElementById('currentNum');
-const totalNumEl      = document.getElementById('totalNum');
-const progressPercent = document.getElementById('progressPercent');
+const currentNumEl     = document.getElementById('currentNum');
+const totalNumEl       = document.getElementById('totalNum');
+const progressPercent  = document.getElementById('progressPercent');
 
-/* =====================================================
-   3. STATE — Status Aplikasi
-   ===================================================== */
-let deck         = [];   // Kartu yang sudah di-shuffle dan belum ditampilkan
-let currentIndex = -1;   // -1 = belum mulai, >= 0 = index kartu yang sedang aktif
-let isAnimating  = false; // Flag untuk mencegah spam klik saat animasi berjalan
-let hasStarted   = false; // Apakah tombol pertama sudah ditekan
 
-/* =====================================================
-   4. FISHER-YATES SHUFFLE
-   Algoritma shuffle yang merata dan tidak bias.
-   Setiap permutasi memiliki probabilitas yang sama.
-   ===================================================== */
+/* 3. STATE
+   Variabel yang menyimpan kondisi aplikasi saat ini. */
+let deck         = [];    // array pertanyaan yang sudah di-shuffle
+let currentIndex = -1;    // -1 berarti belum mulai, >= 0 adalah index kartu aktif
+let isAnimating  = false; // mencegah klik ganda saat animasi sedang berjalan
+let hasStarted   = false; // apakah tombol pertama sudah ditekan
+
+
+/* 4. FISHER-YATES SHUFFLE
+   Algoritma shuffle yang benar-benar acak dan tidak bias.
+   Membuat salinan array agar array asli tidak termutasi. */
 function shuffleArray(arr) {
-  const shuffled = [...arr]; // Buat salinan, jangan mutasi array asli
+  const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // Swap
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
 }
 
-/* =====================================================
-   5. STAR BACKGROUND GENERATOR
-   Membuat titik-titik bintang secara acak di background.
-   ===================================================== */
+
+/* 5. STAR BACKGROUND GENERATOR
+   Membuat elemen titik bintang secara acak dan menyisipkannya ke container. */
 function generateStars() {
   const container = document.getElementById('starsContainer');
-  const totalStars = 120; // Jumlah bintang
+  const totalStars = 120;
 
   for (let i = 0; i < totalStars; i++) {
     const star = document.createElement('div');
     star.classList.add('star');
 
-    // Ukuran acak: 1px - 3px
-    const size = Math.random() * 2 + 0.8;
-    // Posisi acak di seluruh layar
-    const top  = Math.random() * 100;
-    const left = Math.random() * 100;
-    // Kecepatan kedip acak: 2s - 6s
-    const duration = Math.random() * 4 + 2;
+    const size     = Math.random() * 2 + 0.8;  // ukuran: 0.8px – 2.8px
+    const top      = Math.random() * 100;
+    const left     = Math.random() * 100;
+    const duration = Math.random() * 4 + 2;    // durasi kedip: 2s – 6s
     const delay    = Math.random() * 5;
-    // Opacity dasar acak: 0.3 - 0.9
-    const opacity  = Math.random() * 0.6 + 0.3;
+    const opacity  = Math.random() * 0.6 + 0.3; // opacity dasar: 0.3 – 0.9
 
     star.style.cssText = `
       width: ${size}px;
@@ -129,107 +117,85 @@ function generateStars() {
   }
 }
 
-/* =====================================================
-   6. UPDATE PROGRESS
-   Perbarui tampilan progress bar dan teks info.
-   ===================================================== */
+
+/* 6. UPDATE PROGRESS
+   Sinkronkan angka dan lebar progress bar dengan state saat ini. */
 function updateProgress() {
   const total   = questions.length;
   const shown   = hasStarted ? currentIndex + 1 : 0;
   const percent = hasStarted ? Math.round((shown / total) * 100) : 0;
 
-  // Update teks angka
-  currentNumEl.textContent = shown;
-  totalNumEl.textContent   = total;
-  progressPercent.textContent = `${percent}%`;
-
-  // Update progress bar fill
-  progressBarFill.style.width = `${percent}%`;
+  currentNumEl.textContent        = shown;
+  totalNumEl.textContent          = total;
+  progressPercent.textContent     = `${percent}%`;
+  progressBarFill.style.width     = `${percent}%`;
   progressBarTrack.setAttribute('aria-valuenow', percent);
 }
 
-/* =====================================================
-   7. SHOW CARD
-   Tampilkan kartu pertanyaan sesuai index.
-   Argumen `animate` mengontrol apakah ada animasi masuk.
-   ===================================================== */
+
+/* 7. SHOW CARD
+   Tampilkan pertanyaan di index tertentu dengan arah animasi yang sesuai.
+   direction: 'forward' = animasi dari bawah, 'backward' = dari atas. */
 function showCard(index, animate = true, direction = 'forward') {
-  const question = deck[index];
+  cardQuestion.textContent = deck[index];
 
-  // Update teks kartu
-  cardQuestion.textContent = question;
-
-  // Sembunyikan hint saat kartu sudah mulai
   if (cardHint) cardHint.style.display = 'none';
 
-  // Update state tombol prev
+  // Tombol Sebelumnya aktif hanya jika bukan kartu pertama
   btnPrev.disabled = (index <= 0);
 
-  // Animasi masuk: dari bawah (forward) atau dari atas (backward)
   if (animate) {
     activeCard.classList.remove('card-enter', 'card-enter-reverse');
-    void activeCard.offsetWidth;
+    void activeCard.offsetWidth; // paksa reflow agar animasi bisa di-restart
     activeCard.classList.add(direction === 'backward' ? 'card-enter-reverse' : 'card-enter');
   }
 
-  // Update ghost visibility berdasarkan sisa kartu
   updateGhosts(index);
-  // Update progress
   updateProgress();
 }
 
-/* =====================================================
-   8. UPDATE GHOSTS
-   Kartu ghost (tumpukan) di belakang: hilang jika sisa sedikit.
-   ===================================================== */
+
+/* 8. UPDATE GHOSTS
+   Kurangi atau hilangkan ghost card sesuai sisa pertanyaan yang ada. */
 function updateGhosts(currentIdx) {
-  const remaining = deck.length - 1 - currentIdx; // Sisa kartu setelah kartu ini
+  const remaining = deck.length - 1 - currentIdx;
 
-  // Ghost 1 (langsung di belakang): tampil jika sisa >= 1
-  ghost1.style.opacity    = remaining >= 1 ? '' : '0';
-  ghost1.style.transform  = remaining >= 1 ? '' : 'translateY(0) scale(1)';
+  // ghost-1 tampil jika masih ada minimal 1 kartu tersisa
+  ghost1.style.opacity   = remaining >= 1 ? '' : '0';
+  ghost1.style.transform = remaining >= 1 ? '' : 'translateY(0) scale(1)';
 
-  // Ghost 2 (paling belakang): tampil jika sisa >= 2
-  ghost2.style.opacity    = remaining >= 2 ? '' : '0';
-  ghost2.style.transform  = remaining >= 2 ? '' : 'translateY(0) scale(1)';
+  // ghost-2 tampil jika masih ada minimal 2 kartu tersisa
+  ghost2.style.opacity   = remaining >= 2 ? '' : '0';
+  ghost2.style.transform = remaining >= 2 ? '' : 'translateY(0) scale(1)';
 }
 
-/* =====================================================
-   9. SHOW EMPTY STATE
-   Tampilkan state saat semua pertanyaan sudah ditampilkan.
-   ===================================================== */
+
+/* 9. SHOW EMPTY STATE
+   Tampilkan pesan selesai saat semua kartu sudah ditampilkan. */
 function showEmptyState() {
-  // Animasi exit kartu aktif
   activeCard.classList.add('card-exit');
 
   setTimeout(() => {
-    // Sembunyikan kartu aktif dan ghost
-    activeCard.style.visibility  = 'hidden';
-    ghost1.style.opacity         = '0';
-    ghost2.style.opacity         = '0';
+    activeCard.style.visibility = 'hidden';
+    ghost1.style.opacity        = '0';
+    ghost2.style.opacity        = '0';
     cardStage.classList.add('is-empty');
 
-    // Tampilkan empty state
     emptyState.classList.add('is-visible');
     emptyState.removeAttribute('aria-hidden');
 
-    // Nonaktifkan tombol Berikutnya
     btnNext.disabled = true;
   }, 350);
 }
 
-/* =====================================================
-   10. NEXT CARD
-   Logika utama: tampilkan kartu berikutnya atau
-   empty state jika semua sudah ditampilkan.
-   ===================================================== */
+
+/* 10. NEXT CARD
+   Tampilkan kartu berikutnya. Kartu pertama langsung masuk tanpa animasi exit. */
 function nextCard() {
-  // Cegah klik ganda saat animasi
   if (isAnimating) return;
 
   const nextIndex = currentIndex + 1;
 
-  // Cek apakah masih ada kartu
   if (nextIndex >= deck.length) {
     showEmptyState();
     return;
@@ -238,22 +204,19 @@ function nextCard() {
   isAnimating = true;
 
   if (!hasStarted) {
-    // === PERTAMA KALI: Tidak ada animasi exit, langsung masuk ===
     hasStarted   = true;
     currentIndex = nextIndex;
     showCard(currentIndex, true, 'forward');
-
     isAnimating = false;
 
   } else {
-    // === KARTU BERIKUTNYA: Animasi exit dulu, lalu masuk ===
     activeCard.classList.add('card-exit');
 
     setTimeout(() => {
       activeCard.classList.remove('card-exit');
       currentIndex = nextIndex;
 
-      // Jika ini kartu terakhir, update teks tombol
+      // Ubah label tombol saat ini adalah kartu terakhir
       if (currentIndex >= deck.length - 1) {
         btnNext.innerHTML = `
           <span>Kartu Terakhir</span>
@@ -264,29 +227,26 @@ function nextCard() {
 
       showCard(currentIndex, true, 'forward');
       isAnimating = false;
-
     }, 380);
   }
 }
 
-/* =====================================================
-   11. PREV CARD
-   Kembali ke kartu sebelumnya.
-   ===================================================== */
+
+/* 11. PREV CARD
+   Kembali ke kartu sebelumnya dengan animasi arah berlawanan. */
 function prevCard() {
   if (isAnimating) return;
   if (currentIndex <= 0) return;
 
   isAnimating = true;
 
-  // Animasi exit ke bawah
   activeCard.classList.add('card-exit-reverse');
 
   setTimeout(() => {
     activeCard.classList.remove('card-exit-reverse');
     currentIndex--;
 
-    // Pastikan tombol Next normal kembali
+    // Kembalikan label tombol Berikutnya jika sebelumnya sudah berubah
     btnNext.disabled = false;
     btnNext.innerHTML = `
       <span>Berikutnya</span>
@@ -299,28 +259,23 @@ function prevCard() {
   }, 380);
 }
 
-/* =====================================================
-   11. RESET
-   Kocok ulang kartu dan mulai dari awal.
-   ===================================================== */
+
+/* 12. RESET
+   Kocok ulang semua kartu dan kembalikan tampilan ke kondisi awal. */
 function resetDeck() {
   isAnimating  = false;
   hasStarted   = false;
   currentIndex = -1;
 
-  // Shuffle ulang deck
   deck = shuffleArray(questions);
 
-  // Reset UI kartu aktif
   activeCard.classList.remove('card-exit', 'card-exit-reverse', 'card-enter', 'card-enter-reverse');
   activeCard.style.visibility = 'visible';
 
-  // Reset teks kartu ke layar awal
   cardQuestion.textContent = 'Siap membuka obrolan yang lebih dalam?';
   if (cardHint) cardHint.style.display = 'block';
 
-  // Reset tombol
-  btnNext.disabled  = false;
+  btnNext.disabled = false;
   btnNext.innerHTML = `
     <span>Berikutnya</span>
     <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -328,35 +283,30 @@ function resetDeck() {
     </svg>`;
   btnPrev.disabled = true;
 
-  // Sembunyikan empty state
   emptyState.classList.remove('is-visible');
   emptyState.setAttribute('aria-hidden', 'true');
   cardStage.classList.remove('is-empty');
 
-  // Tampilkan kembali ghost
   ghost1.style.opacity   = '';
   ghost1.style.transform = '';
   ghost2.style.opacity   = '';
   ghost2.style.transform = '';
 
-  // Reset progress bar
   updateProgress();
 
-  // Animasi spin pada icon reset
+  // Putar ikon reset sebagai feedback visual
   btnReset.classList.add('is-spinning');
   setTimeout(() => btnReset.classList.remove('is-spinning'), 500);
 
-  // Animasi masuk untuk kartu welcome
   void activeCard.offsetWidth;
   activeCard.classList.add('card-enter');
   setTimeout(() => activeCard.classList.remove('card-enter'), 500);
 }
 
-/* =====================================================
-   12. SWIPE SUPPORT (Touch Gesture)
-   Pengguna bisa swipe ke atas untuk kartu berikutnya.
-   Membuat UX lebih natural di mobile.
-   ===================================================== */
+
+/* 13. SWIPE SUPPORT
+   Swipe ke atas di area kartu untuk maju ke kartu berikutnya.
+   Hanya trigger jika gerakan vertikal lebih dominan dari horizontal. */
 let touchStartY = 0;
 let touchStartX = 0;
 
@@ -369,22 +319,21 @@ activeCard.addEventListener('touchend', (e) => {
   const deltaY = touchStartY - e.changedTouches[0].clientY;
   const deltaX = Math.abs(touchStartX - e.changedTouches[0].clientX);
 
-  // Hanya trigger jika swipe vertikal dominan dan cukup jauh (>50px)
   if (Math.abs(deltaY) > 50 && Math.abs(deltaY) > deltaX) {
-    if (deltaY > 0) {
-      // Swipe ke atas → kartu berikutnya
-      nextCard();
-    }
+    if (deltaY > 0) nextCard();
   }
 }, { passive: true });
 
-/* =====================================================
-   13. KEYBOARD SHORTCUT
-   Space/Enter/ArrowRight → Kartu Berikutnya
-   R → Reset
-   ===================================================== */
+
+/* 14. KEYBOARD SHORTCUTS
+   Panah kanan / Space / Enter  → kartu berikutnya
+   Panah kiri                   → kartu sebelumnya
+   R                            → reset */
 document.addEventListener('keydown', (e) => {
-  const isButtonFocused = document.activeElement === btnNext || document.activeElement === btnReset || document.activeElement === btnPrev;
+  const isButtonFocused =
+    document.activeElement === btnNext ||
+    document.activeElement === btnPrev ||
+    document.activeElement === btnReset;
 
   if (!isButtonFocused) {
     if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') {
@@ -401,42 +350,32 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* =====================================================
-   14. EVENT LISTENERS — Tombol
-   ===================================================== */
+
+/* 15. EVENT LISTENERS */
 btnNext.addEventListener('click', nextCard);
 btnPrev.addEventListener('click', prevCard);
 btnReset.addEventListener('click', resetDeck);
 
-/* =====================================================
-   15. INIT — Inisialisasi Aplikasi
-   Jalankan saat halaman pertama kali dimuat.
-   ===================================================== */
+
+/* 16. INIT
+   Jalankan satu kali saat halaman dimuat. */
 function init() {
-  // Generate bintang background
   generateStars();
 
-  // Shuffle kartu pertama kali
   deck = shuffleArray(questions);
 
-  // Tampilkan hint di kartu welcome, sembunyikan card number
   if (cardHint) cardHint.style.display = 'block';
   cardQuestion.textContent = 'Siap membuka obrolan yang lebih dalam?';
 
-  // Inisialisasi state tombol
-  btnPrev.disabled = true;
-
-  // Inisialisasi progress bar
+  btnPrev.disabled       = true;
   totalNumEl.textContent = questions.length;
   updateProgress();
 
-  // Animasi masuk kartu welcome
   void activeCard.offsetWidth;
   activeCard.classList.add('card-enter');
   setTimeout(() => activeCard.classList.remove('card-enter'), 500);
 
-  console.log(`[HelloChat] ${questions.length} pertanyaan siap, sudah di-shuffle! ✦`);
+  console.log(`[HelloChat] ${questions.length} pertanyaan siap. ✦`);
 }
 
-// Jalankan!
 init();
