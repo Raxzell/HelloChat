@@ -1,0 +1,715 @@
+/* =====================================================
+   HELLOCHAT — style.css
+   Tema: Langit Malam (Night Sky Minimalist)
+   Font: Plus Jakarta Sans
+   ===================================================== */
+
+/* =====================================================
+   1. CSS CUSTOM PROPERTIES (Design Tokens)
+   Semua warna, spacing, dan transisi didefinisikan di sini
+   supaya gampang diubah secara konsisten.
+   ===================================================== */
+:root {
+  /* --- Palette: Night Sky --- */
+  --clr-bg-deepest:   #050810;   /* Hitam ruang angkasa */
+  --clr-bg-deep:      #080d1a;   /* Biru gelap tengah malam */
+  --clr-bg-mid:       #0d1526;   /* Biru tengah malam */
+  --clr-surface:      #111a30;   /* Permukaan kartu */
+  --clr-surface-2:    #172040;   /* Kartu ghost lebih terang */
+  --clr-border:       rgba(120, 160, 255, 0.12);
+  --clr-border-glow:  rgba(120, 160, 255, 0.30);
+
+  /* --- Accent Colors --- */
+  --clr-accent:       #6d9ef8;   /* Biru bintang */
+  --clr-accent-soft:  #4a7cdc;
+  --clr-accent-glow:  rgba(109, 158, 248, 0.20);
+  --clr-star:         #c8d8ff;   /* Warna bintang kecil */
+  --clr-nebula-1:     rgba(80, 50, 180, 0.12);  /* Ungu nebula */
+  --clr-nebula-2:     rgba(30, 80, 200, 0.10);  /* Biru nebula */
+
+  /* --- Text --- */
+  --clr-text-primary:   #e8eeff;
+  --clr-text-secondary: #8fa8d8;
+  --clr-text-muted:     #4a6090;
+
+  /* --- Spacing --- */
+  --space-xs:   4px;
+  --space-sm:   8px;
+  --space-md:   16px;
+  --space-lg:   24px;
+  --space-xl:   40px;
+  --space-2xl:  64px;
+
+  /* --- Border Radius --- */
+  --radius-sm:  8px;
+  --radius-md:  16px;
+  --radius-lg:  24px;
+  --radius-xl:  32px;
+
+  /* --- Transitions --- */
+  --trans-fast:   0.15s ease;
+  --trans-base:   0.30s ease;
+  --trans-slow:   0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-spring: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* --- Shadows --- */
+  --shadow-card:  0 20px 60px rgba(0, 5, 30, 0.6), 0 4px 20px rgba(0, 5, 30, 0.4);
+  --shadow-glow:  0 0 40px rgba(109, 158, 248, 0.15);
+  --shadow-btn:   0 4px 24px rgba(109, 158, 248, 0.25);
+}
+
+/* =====================================================
+   2. RESET & BASE
+   ===================================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background-color: var(--clr-bg-deepest);
+  color: var(--clr-text-primary);
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* =====================================================
+   3. STAR BACKGROUND
+   Dibuat dinamis lewat JS, tapi animasinya di sini.
+   ===================================================== */
+.stars-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Bintang individual */
+.star {
+  position: absolute;
+  background: var(--clr-star);
+  border-radius: 50%;
+  animation: starTwinkle var(--twinkle-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+  opacity: var(--star-opacity, 0.6);
+}
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: var(--star-opacity, 0.6); transform: scale(1); }
+  50%       { opacity: calc(var(--star-opacity, 0.6) * 0.3); transform: scale(0.7); }
+}
+
+/* Overlay nebula — gradien ambient di background */
+.stars-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, var(--clr-nebula-1), transparent),
+    radial-gradient(ellipse 50% 60% at 80% 70%, var(--clr-nebula-2), transparent),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(10, 20, 80, 0.3), transparent);
+  pointer-events: none;
+}
+
+/* =====================================================
+   4. APP WRAPPER — Container Utama
+   ===================================================== */
+.app-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 560px;
+  min-height: 100dvh;
+  min-height: 100vh;
+  padding: var(--space-xl) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+}
+
+/* =====================================================
+   5. HEADER
+   ===================================================== */
+.app-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.logo-icon {
+  font-size: 1.4rem;
+  color: var(--clr-accent);
+  /* Animasi berdenyut seperti bintang */
+  animation: logoPulse 4s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes logoPulse {
+  0%, 100% { text-shadow: 0 0 8px var(--clr-accent); opacity: 1; }
+  50%       { text-shadow: 0 0 20px var(--clr-accent), 0 0 40px rgba(109, 158, 248, 0.5); opacity: 0.8; }
+}
+
+.logo-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--clr-text-primary) 30%, var(--clr-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-tagline {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--clr-text-muted);
+  letter-spacing: 0.03em;
+  font-style: italic;
+}
+
+/* =====================================================
+   6. PROGRESS BAR
+   ===================================================== */
+.progress-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-label {
+  font-size: 0.78rem;
+  color: var(--clr-text-muted);
+  font-weight: 400;
+}
+
+.progress-label strong {
+  color: var(--clr-accent);
+  font-weight: 600;
+}
+
+.progress-percent {
+  font-size: 0.78rem;
+  color: var(--clr-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 3px;
+  background: var(--clr-surface-2);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--clr-accent-soft), var(--clr-accent));
+  border-radius: 99px;
+  transition: width var(--trans-slow);
+  box-shadow: 0 0 8px var(--clr-accent);
+}
+
+/* =====================================================
+   7. CARD STAGE — Area Tumpukan Kartu
+   ===================================================== */
+.card-stage {
+  position: relative;
+  width: 100%;
+  /* Tinggi minimum kartu supaya tidak loncat-loncat */
+  min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Ghost Cards (Tumpukan dekoratif di belakang) ---- */
+.card-stack-ghost {
+  position: absolute;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  transition: transform var(--trans-slow), opacity var(--trans-slow);
+  pointer-events: none;
+}
+
+.ghost-1 {
+  height: calc(100% - 12px);
+  transform: translateY(10px) scale(0.97);
+  opacity: 0.55;
+  background: var(--clr-surface-2);
+  z-index: 1;
+}
+
+.ghost-2 {
+  height: calc(100% - 24px);
+  transform: translateY(20px) scale(0.94);
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* Saat kartu habis, ghost naik ke atas */
+.card-stage.is-empty .ghost-1,
+.card-stage.is-empty .ghost-2 {
+  opacity: 0;
+  transform: translateY(0) scale(1);
+}
+
+/* ---- Active Card ---- */
+.active-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 340px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;         /* center isi secara horizontal */
+  justify-content: center;     /* center isi secara vertikal */
+  box-shadow: var(--shadow-card), var(--shadow-glow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: default;
+  transition:
+    transform var(--trans-slow),
+    opacity var(--trans-slow),
+    box-shadow var(--trans-base),
+    border-color var(--trans-base);
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+/* Hover effect — sedikit terangkat */
+.active-card:hover {
+  box-shadow: var(--shadow-card), 0 0 60px rgba(109, 158, 248, 0.22);
+  border-color: var(--clr-border-glow);
+  transform: translateY(-4px);
+}
+
+/* ---- Animasi Kartu: Keluar (slide ke atas + fade) ---- */
+.active-card.card-exit {
+  animation: cardExit 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes cardExit {
+  0%   { opacity: 1;   transform: translateY(-4px) rotate(0deg); }
+  100% { opacity: 0;   transform: translateY(-60px) rotate(-4deg) scale(0.9); }
+}
+
+/* ---- Animasi Kartu: Keluar ke Bawah (backward) ---- */
+.active-card.card-exit-reverse {
+  animation: cardExitReverse 0.38s cubic-bezier(0.4, 0, 1, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes cardExitReverse {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(50px) rotate(2deg) scale(0.93); }
+}
+
+/* ---- Animasi Kartu: Masuk dari Bawah (forward) ---- */
+.active-card.card-enter {
+  animation: cardEnter 0.45s var(--trans-spring) forwards;
+}
+
+@keyframes cardEnter {
+  0%   { opacity: 0; transform: translateY(40px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* ---- Animasi Kartu: Masuk dari Atas (backward) ---- */
+.active-card.card-enter-reverse {
+  animation: cardEnterReverse 0.45s var(--trans-spring) forwards;
+}
+
+@keyframes cardEnterReverse {
+  0%   { opacity: 0; transform: translateY(-40px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* ---- Isi Kartu ---- */
+.card-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* center anak secara horizontal */
+  justify-content: center;  /* center anak secara vertikal */
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.card-number {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--clr-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 4px 10px;
+  border: 1px solid rgba(109, 158, 248, 0.25);
+  border-radius: 99px;
+  background: rgba(109, 158, 248, 0.08);
+}
+
+.card-question {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--clr-text-primary);
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+/* Hint teks di bawah pertanyaan awal */
+.card-cta-hint {
+  font-size: 0.82rem;
+  color: var(--clr-text-muted);
+  font-style: italic;
+  text-align: center;
+  width: 100%;
+}
+
+/* ---- Hiasan Sudut Kartu (Dekoratif) ---- */
+.active-card::before {
+  content: '✦';
+  position: absolute;
+  bottom: var(--space-lg);
+  right: var(--space-xl);
+  font-size: 1.2rem;
+  color: rgba(109, 158, 248, 0.15);
+  line-height: 1;
+  pointer-events: none;
+  transition: color var(--trans-base);
+}
+
+.active-card:hover::before {
+  color: rgba(109, 158, 248, 0.35);
+}
+
+/* =====================================================
+   8. EMPTY STATE — Semua Kartu Sudah Habis
+   ===================================================== */
+.card-empty-state {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: none;  /* Ditampilkan lewat JS */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  animation: cardEnter 0.5s var(--trans-spring) forwards;
+}
+
+.card-empty-state.is-visible {
+  display: flex;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: var(--clr-accent);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+.empty-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--clr-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.empty-subtitle {
+  font-size: 0.88rem;
+  color: var(--clr-text-secondary);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+/* =====================================================
+   9. CONTROLS — Tombol Navigasi
+   ===================================================== */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  justify-content: center;
+}
+
+/* ---- Base Button Style ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    transform var(--trans-fast),
+    box-shadow var(--trans-fast),
+    background var(--trans-base),
+    opacity var(--trans-base);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Ripple effect */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn:active::after {
+  opacity: 0.06;
+}
+
+/* ---- Primary Button (Berikutnya) ---- */
+.btn-primary {
+  background: linear-gradient(135deg, var(--clr-accent-soft), var(--clr-accent));
+  color: #fff;
+  padding: 14px 28px;
+  min-width: 170px;
+  box-shadow: var(--shadow-btn);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 32px rgba(109, 158, 248, 0.40);
+}
+
+/* ---- Ghost Button (Reset — icon only) ---- */
+.btn-ghost {
+  background: transparent;
+  color: var(--clr-text-muted);
+  padding: 14px;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  min-width: unset;
+  width: 48px;
+  height: 48px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(109, 158, 248, 0.08);
+  border-color: var(--clr-border-glow);
+  color: var(--clr-accent);
+  transform: translateY(-2px);
+}
+
+/* ---- Secondary Button (Sebelumnya) ---- */
+.btn-secondary {
+  background: transparent;
+  color: var(--clr-text-secondary);
+  padding: 14px 20px;
+  border: 1px solid var(--clr-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--clr-accent-glow);
+  border-color: var(--clr-border-glow);
+  color: var(--clr-accent);
+  transform: translateY(-2px);
+}
+
+/* ---- Button Icon ---- */
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+/* Animasi spin untuk icon reset saat diklik */
+.btn-secondary.is-spinning .btn-icon {
+  animation: spinOnce 0.5s ease-in-out;
+}
+
+@keyframes spinOnce {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* =====================================================
+   10. RESPONSIVE — Mobile & Tablet
+   ===================================================== */
+
+/* Tablet (max-width: 600px) */
+@media (max-width: 600px) {
+  .app-wrapper {
+    padding: var(--space-lg) var(--space-md);
+    gap: var(--space-md);
+    justify-content: flex-start;
+    padding-top: 50px;
+    padding-bottom: 40px;
+    min-height: 100dvh;
+  }
+
+  .logo-text {
+    font-size: 1.4rem;
+  }
+
+  .active-card {
+    padding: var(--space-lg) var(--space-lg);
+    min-height: 300px;
+  }
+
+  .card-question {
+    font-size: 1.1rem;
+  }
+
+  .btn-primary {
+    min-width: 140px;
+    padding: 13px 22px;
+  }
+}
+
+/* Mobile kecil (max-width: 380px) */
+@media (max-width: 380px) {
+  .card-question {
+    font-size: 1rem;
+  }
+
+  .controls {
+    gap: var(--space-sm);
+  }
+
+  .btn-primary {
+    min-width: 120px;
+    font-size: 0.85rem;
+    padding: 12px 18px;
+  }
+
+  .btn-secondary {
+    padding: 12px 14px;
+  }
+
+  .btn-secondary span {
+    display: none; /* Di mobile sangat kecil, sembunyikan teks reset, tampilkan icon saja */
+  }
+}
+
+/* Desktop lebar */
+@media (min-width: 768px) {
+  .app-wrapper {
+    gap: var(--space-xl);
+  }
+
+  .card-stage {
+    min-height: 380px;
+  }
+
+  .card-question {
+    font-size: 1.35rem;
+  }
+}
+
+/* =====================================================
+   11. ACCESSIBILITY
+   ===================================================== */
+
+/* Fokus visible untuk keyboard navigasi */
+:focus-visible {
+  outline: 2px solid var(--clr-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Kurangi motion untuk user yang prefer-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =====================================================
+   12. SCROLLBAR (opsional, untuk kartu sangat panjang)
+   ===================================================== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--clr-bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-text-muted);
+  border-radius: 99px;
+}
